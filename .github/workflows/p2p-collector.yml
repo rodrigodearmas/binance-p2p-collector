@@ -29,7 +29,7 @@ jobs:
           ROWS: "50"
           CSV_PATH: "binance_p2p_prices.csv"
           # 00:00 Venezuela del 15/ene/2026 == 04:00 UTC
-          START_DATE: "2026-01-15T04:00:00Z"
+          START_DATE: "2026-01-14T14:30:00Z"
           # 1 semana después (00:00 VET del 22/ene/2026) == 04:00 UTC
           END_DATE: "2026-01-22T04:00:00Z"
           MIN_ORDER: "100"
