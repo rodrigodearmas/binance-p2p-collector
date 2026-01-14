@@ -7,12 +7,13 @@ import requests
 API_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
 
 # --- Config desde variables de entorno ---
-ASSET = os.getenv("ASSET", "USDT")          # Activo cripto
-PAY_TYPES = [p for p in os.getenv("PAY_TYPES", "").split(",") if p]  # "Pago Móvil,Banesco,Mercantil"FIAT  = os.getenv("FIAT",  "VES")           # Moneda fiat
-ROWS = int(os.getenv("ROWS", "50"))         # Traemos más filas para filtrar top10
+ASSET = os.getenv("ASSET", "USDT")            # Activo cripto
+FIAT  = os.getenv("FIAT",  "VES")             # Moneda fiat
+PAY_TYPES = [p for p in os.getenv("PAY_TYPES", "Pago Móvil,Banesco,Mercantil").split(",") if p]
+ROWS = int(os.getenv("ROWS", "50"))           # Traemos más filas para filtrar top10
 CSV_PATH = os.getenv("CSV_PATH", "binance_p2p_prices.csv")
-START_DATE = os.getenv("START_DATE", "")    # ISO8601, e.g., "2026-01-15T04:00:00Z" (00:00 VET)
-END_DATE   = os.getenv("END_DATE", "")      # ISO8601, e.g., "2026-01-22T04:00:00Z" (+7 días)
+START_DATE = os.getenv("START_DATE", "")      # ISO8601, e.g., "2026-01-15T04:00:00Z" (00:00 VET)
+END_DATE   = os.getenv("END_DATE", "")        # ISO8601, e.g., "2026-01-22T04:00:00Z" (+7 días)
 MIN_ORDER  = float(os.getenv("MIN_ORDER", "100"))  # Monto objetivo de orden (en FIAT)
 RETRIES    = int(os.getenv("RETRIES", "2"))        # Reintentos si falla
 
@@ -31,13 +32,17 @@ def in_window():
     if START_DATE:
         try:
             s = dt.datetime.fromisoformat(START_DATE.replace("Z", "+00:00"))
-            if n < s: return False
-        except: pass
+            if n < s:
+                return False
+        except:
+            pass
     if END_DATE:
         try:
             e = dt.datetime.fromisoformat(END_DATE.replace("Z", "+00:00"))
-            if n > e: return False
-        except: pass
+            if n > e:
+                return False
+        except:
+            pass
     return True
 
 def fetch_side(trade_type):
@@ -48,13 +53,13 @@ def fetch_side(trade_type):
     payload = {
         "page": 1,
         "rows": ROWS,
-        "payTypes": PAY_TYPES,       # ¡Ojo! Estos nombres deben coincidir con los tokens internos de Binance.
-        "publisherType": None,
+        "payTypes": PAY_TYPES,       # ¡Ojo! Deben coincidir con los tokens internos de Binance.
+        "publisherType": None,       # Sin filtro (cualquiera)
         "asset": ASSET,
         "tradeType": trade_type,
         "fiat": FIAT,
-        "merchantCheck": False
-        # Nota: 'transAmount' fue visto en ejemplos antiguos, pero puede no ser soportado: filtramos post-respuesta.
+        "merchantCheck": False       # Sin limitar a merchants/verificados
+        # Nota: 'transAmount' existió en ejemplos antiguos; filtramos post-respuesta por MIN_ORDER.
     }
     last_err = None
     for i in range(RETRIES + 1):
@@ -78,7 +83,7 @@ def fetch_side(trade_type):
                     except:
                         price_f, min_f, max_f = None, None, None
 
-                    # Si no hay límites, lo aceptamos; si hay, validamos que pueda operar MIN_ORDER
+                    # Si no hay límites declarados, lo aceptamos; si hay, validamos MIN_ORDER
                     valid_order = True
                     if min_f is not None and min_f > MIN_ORDER:
                         valid_order = False
@@ -97,9 +102,9 @@ def fetch_side(trade_type):
                         "max_price": None
                     }
                 if trade_type == "SELL":
-                    best = min(prices)            # mejor para comprar cripto
+                    best = min(prices)            # Mejor para comprar cripto
                 else:
-                    best = max(prices)            # mejor para vender cripto
+                    best = max(prices)            # Mejor para vender cripto
                 return {
                     "prices": prices,
                     "count": len(prices),
@@ -167,3 +172,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
