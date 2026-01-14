@@ -9,7 +9,7 @@ API_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"  # NO of
 # --- Config ---
 ASSET      = os.getenv("ASSET", "USDT")
 FIAT       = os.getenv("FIAT",  "VES")
-PAY_TYPES  = [p.strip() for p in os.getenv("PAY_TYPES", "Pago Móvil,Banesco,Mercantil").split(",") if p.strip()]
+PAY_TYPES  = [p.strip() for p in os.getenv("PAY_TYPES", "").split(",") if p.strip()]
 ROWS       = int(os.getenv("ROWS", "50"))
 CSV_PATH   = os.getenv("CSV_PATH", "binance_p2p_prices.csv")
 START_DATE = os.getenv("START_DATE", "")
