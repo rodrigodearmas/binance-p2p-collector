@@ -27,7 +27,7 @@ jobs:
         env:
           ASSET: "USDT"
           FIAT: "VES"
-          PAY_TYPES: "Pago Móvil,Banesco,Mercantil"
+          PAY_TYPES: ""
           ROWS: "50"
           CSV_PATH: "binance_p2p_prices.csv"
           # 00:00 Venezuela del 15/ene/2026 == 04:00 UTC
