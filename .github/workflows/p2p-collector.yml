@@ -3,8 +3,8 @@ name: Collect Binance P2P price (USDT/VES)
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # cada 15 min (UTC) - evita exactos en punto por posibles demoras
-  workflow_dispatch:         # permitir ejecución manual
+    - cron: "*/15 * * * *"   # cada 15 min (UTC)
+  workflow_dispatch:         # ejecución manual opcional
 
 permissions:
   contents: write
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}   # asegurar que el checkout queda en la rama por defecto
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,7 +31,7 @@ jobs:
           ROWS: "50"
           CSV_PATH: "binance_p2p_prices.csv"
           # 00:00 Venezuela del 15/ene/2026 == 04:00 UTC
-          START_DATE: "2026-01-14T14:30:00Z"
+          START_DATE: "2026-01-15T04:00:00Z"
           # 1 semana después (00:00 VET del 22/ene/2026) == 04:00 UTC
           END_DATE: "2026-01-22T04:00:00Z"
           MIN_ORDER: "100"
@@ -38,10 +40,7 @@ jobs:
           python -m pip install --upgrade pip requests
           python collect_p2p.py
 
-      - name: Commit & push CSV
+      - name: Commit files
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add binance_p2p_prices.csv
-          git commit -m "Update CSV ($(date -u +"%Y-%m-%d %H:%M:%SZ"))" || echo "No changes"
-          git push
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
