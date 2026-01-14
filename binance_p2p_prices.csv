@@ -1,0 +1,2 @@
+timestamp_utc,asset,fiat,pay_types,min_order,best_sell,sell_count,sell_min_price,sell_max_price,avg_sell_top10,best_buy,buy_count,buy_min_price,buy_max_price,avg_buy_top10,spread_buy_minus_sell,rows_considered
+2026-01-14T14:49:04.635492+00:00,USDT,VES,"Pago Móvil,Banesco,Mercantil",100.0,,0,,,,,0,,,,,50
